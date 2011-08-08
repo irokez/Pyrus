@@ -11,7 +11,7 @@ import time
 
 sys.path.append('src')
 
-f = open('web/html/tagging.html')
+f = open('../html/tagging.html')
 content = f.read()
 f.close()
 
