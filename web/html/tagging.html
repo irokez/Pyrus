@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>POS-tagging demo - Pyrus</title>
+        <link rel="stylesheet" href="css/main.css" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <!--[if lt IE 9]><script src="css/html5.js"></script><![endif]-->
+    </head>
+    <body>
+        <div id="wrapper">
+            <header>
+                <hgroup>
+                    <h1>Pyrus</h1>
+                </hgroup>
+            </header>
+            <article>
+                <h1>POS-tagging demo</h1>
+                {if len(text)}
+                <div id="result">
+                    <p>{$text}</p>
+                    <p>{$tagged}</p>
+                    <p>Tagged {$words} words in {$time_total} sec, {$words_per_sec} words per sec</p>
+                </div>
+                {else}
+                <div id="description">
+                    <p>Enter the text and press "Tag"</p>
+                </div>
+                {end}
+                <form action="/">
+                    <fieldset>
+                        <div id="text"><textarea name="text"></textarea></div>
+                        <div id="submit"><button type="submit">Tag</button></div>
+                    </fieldset>
+                </form>
+            </article>
+            <footer>
+                <p>&copy; 2011 Pyrus</p>
+            </footer>
+        </div>
+    </body>
+</html>

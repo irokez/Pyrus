@@ -1,0 +1,74 @@
+@import "reset5.css";
+
+body {
+    font-family: sans-serif;
+}
+
+#wrapper {
+    padding: 20px;
+}
+
+header {
+    padding: 20px 0;
+} 
+
+    header h1 {
+        font-size: 32px;
+        font-weight: normal;
+    }
+    
+article {
+    
+}
+
+    article h1 {
+        font-size: 18px;
+        font-weight: normal;
+    }
+    
+    #result {
+        padding: 20px;
+        background: #eee;
+        margin-top: 16px;
+        line-height: 24px;
+    }
+    
+    #description {
+        padding: 20px;
+        background: #eee;
+        margin-top: 16px;
+        line-height: 24px;
+    }
+    
+    form {
+        padding: 20px 0;
+    }
+    
+        div#text {
+            padding-right: 10px;
+            margin-bottom: 16px;
+        }
+        
+            textarea {
+                font-family: serif;
+                font-size: 24px;
+                padding: 5px;
+                width: 100%;
+                height: 300px;
+                border: 1px inset #999;
+            }
+    
+        div#submit {
+            text-align: center;
+        }
+    
+            button {
+                font-size: 24px;
+                padding: 10px;
+                text-align: center;
+                width: 300px;
+            }
+    
+footer {
+    padding: 20px 0;
+}
