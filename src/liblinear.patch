@@ -1,0 +1,29 @@
+--- /home/alexpak/tools/liblinear-1.8/python/liblinearutil.py	2011-08-04 00:58:24.017288401 +0200
++++ /home/alexpak/tools/tmp/liblinear-1.8/python/liblinearutil.py	2011-03-05 09:46:26.000000000 +0100
+@@ -30,7 +30,7 @@
+ 	
+ 	Load a LIBLINEAR model from model_file_name and return.
+ 	"""
+-	model = liblinear.load_model(model_file_name.encode('utf-8'))
++	model = liblinear.load_model(model_file_name)
+ 	if not model: 
+ 		print("can't open model file %s" % model_file_name)
+ 		return None
+@@ -43,7 +43,7 @@
+ 
+ 	Save a LIBLINEAR model to the file model_file_name.
+ 	"""
+-	liblinear.save_model(model_file_name.encode('utf-8'), model)
++	liblinear.save_model(model_file_name, model)
+ 
+ def evaluations(ty, pv):
+ 	"""
+@@ -204,7 +204,7 @@
+ 		y = [0] * len(x)
+ 	ACC = evaluations(y, pred_labels)
+ 	l = len(y)
+-	#print("Accuracy = %g%% (%d/%d)" % (ACC, int(l*ACC//100), l))
++	print("Accuracy = %g%% (%d/%d)" % (ACC, int(l*ACC//100), l))
+ 
+ 	return pred_labels, ACC, pred_values
+ 	
