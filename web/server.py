@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 '''
 Created on Aug 7, 2011
 
@@ -8,10 +9,11 @@ Created on Aug 7, 2011
 import cherrypy
 import sys
 import time
+import cgi
 
 sys.path.append('src')
 
-f = open('../html/tagging.html')
+f = open('web/html/tagging.html')
 content = f.read()
 f.close()
 
@@ -48,7 +50,7 @@ class HelloWorld:
 
 		start = time.time()
 		
-		sentence = re.split('\W+', text)
+		sentence = [word for word in re.split('\W+', text) if len(word.strip())]
 		
 		tagged = []
 		for word, label in tagger.label(sentence):
@@ -59,7 +61,7 @@ class HelloWorld:
 		words_per_sec = words / time_total
 
 		T = template.Template()
-		T.text = text
+		T.text = cgi.escape(text)
 		T.tagged = tagged
 		T.time_total = round(time_total, 2)
 		T.words_per_sec = round(words_per_sec)
@@ -72,4 +74,12 @@ class HelloWorld:
 		return 'test'
 
 cherrypy.server.socket_host = '0.0.0.0'
-cherrypy.quickstart(HelloWorld())
+config = {
+	'/': {
+		'tools.staticdir.on': True,
+     	'tools.staticdir.dir': '/home/alexpak/projects/pyrus/web/public/',
+     	'tools.encode.encoding': 'utf8'
+    }
+}
+
+cherrypy.quickstart(HelloWorld(), config = config)

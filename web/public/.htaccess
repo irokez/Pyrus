@@ -15,3 +15,5 @@ Options -Indexes
     Order allow,deny
     Deny from all
 </FilesMatch>
+
+AddDefaultCharset utf-8
