@@ -16,8 +16,8 @@ path = os.path.dirname(os.path.abspath(__file__)) + '/'
 
 sys.path.append(path + '../src')
 
-f = open(path + 'html/tagging.html')
-content = f.read()
+f = open(path + 'html/tagging.html', 'rb')
+content = f.read().decode()
 f.close()
 
 import pos
