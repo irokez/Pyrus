@@ -10,10 +10,13 @@ import cherrypy
 import sys
 import time
 import cgi
+import os
 
-sys.path.append('src')
+path = os.path.dirname(os.path.abspath(__file__)) + '/'
 
-f = open('web/html/tagging.html')
+sys.path.append(path + '../src')
+
+f = open(path + 'html/tagging.html')
 content = f.read()
 f.close()
 
@@ -21,7 +24,7 @@ import pos
 import re
 import template
 tagger = pos.Tagger()
-tagger.load('tmp/svm.model', 'tmp/ids.pickle')
+tagger.load(path + '../tmp/svm.model', path + '../tmp/ids.pickle')
 
 rus = {
 	'S': 'сущ.', 
@@ -77,7 +80,7 @@ cherrypy.server.socket_host = '0.0.0.0'
 config = {
 	'/': {
 		'tools.staticdir.on': True,
-     	'tools.staticdir.dir': '/home/alexpak/projects/pyrus/web/public/',
+     	'tools.staticdir.dir': path + 'public/',
      	'tools.encode.encoding': 'utf8'
     }
 }
