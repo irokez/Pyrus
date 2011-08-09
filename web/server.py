@@ -74,7 +74,7 @@ class HelloWorld:
 	
 	@cherrypy.expose
 	def test(self):
-		return 'тест'
+		return content
 
 cherrypy.server.socket_host = '0.0.0.0'
 config = {
