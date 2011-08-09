@@ -80,9 +80,9 @@ cherrypy.server.socket_host = '0.0.0.0'
 config = {
 	'/': {
 		'tools.staticdir.on': True,
-     	'tools.staticdir.dir': path + 'public/',
-     	'tools.encode.encoding': 'utf8'
-    }
+		'tools.staticdir.dir': path + 'public/',
+		'tools.encode.encoding': 'utf8'
+	}
 }
 
 cherrypy.quickstart(HelloWorld(), config = config)
