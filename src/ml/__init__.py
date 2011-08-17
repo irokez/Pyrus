@@ -1,3 +1,5 @@
+import pickle
+
 class Classifier:
 	def train(self, x, y):
 		pass
@@ -17,6 +19,18 @@ class Classifier:
 		acc = tp / (tp + fp) if tp + fp else 0
 		
 		return (acc, )
+	
+	def save(self, path):
+		f = open(path, 'wb')
+		pickle.dump(self, f)
+		f.close()
+	
+	@staticmethod
+	def load(path):
+		f = open(path, 'rb')
+		obj = pickle.load(f)
+		f.close()
+		return obj
 	
 class Autoincrement:
 	def __init__(self):

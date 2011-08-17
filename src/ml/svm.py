@@ -7,11 +7,23 @@ Created on Aug 18, 2011
 import config
 import liblinearutil as liblinear
 import ml
+import pickle
 
 class SVM(ml.Classifier):
 	def __init__(self):
 		self._labels = ml.Autoincrement()
 		self._features = ml.Autoincrement()
+		
+	def save(self, path):
+		liblinear.save_model(path + '-model', self._model)
+		del(self._model)
+		ml.Classifier.save(self, path)
+		
+	@staticmethod
+	def load(path):
+		obj = ml.Classifier.load(path)
+		obj._model = liblinear.load_model(path + '-model')
+		return obj
 	
 	def get_class_id(self, C):
 		if C not in self._class_ids:
