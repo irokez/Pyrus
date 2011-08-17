@@ -14,41 +14,17 @@ class NaiveBayes(ml.Classifier):
 	
 	def _gaus(self, i, mean, var):
 		return 1 / math.sqrt(2 * math.pi * var) * math.exp(- (i - mean) ** 2 / (2 * var))
+			
+
+	def _prob(self, C, dim, val):
+		p = 0
+		if dim in self._P[C]:
+			p = self._P[C][dim]
+		elif dim in self._F[C]:
+			p = self._gaus(val, self._F[C][dim][0], self._F[C][dim][1])
+			
+		return p
 	
-	def train1(self, x, y):
-		P = {}
-		
-		data = {}
-		labels = set()
-		i = 0
-		for C in y:
-			labels.add(C)
-			if C not in data:
-				data[C] = []
-			data[C].append(x[i])
-			i += 1
-		
-		for C in data:
-			P[C] = {}
-			ndim = len(x[0]) # number of features
-			for dim in range(0, ndim):
-				mean = 0; var = 0; N = 0
-				
-				# calculate mean and length
-				for sample in data[C]:
-					mean += sample[dim]
-					N += 1
-				mean /= N
-				
-				# calculate variance
-				for sample in data[C]:
-					var += (mean - sample[dim]) ** 2
-				var /= (N - 1)
-				
-				P[C][dim] = (mean, var)
-				
-		self._P = P
-		
 	def train(self, x, y):
 		data = defaultdict(list)
 		labels = set()
@@ -105,39 +81,16 @@ class NaiveBayes(ml.Classifier):
 								
 		self._F = F
 	
-	def prob(self, C, dim, val):
-		p = 0
-		if dim in self._P[C]:
-			p = self._P[C][dim]
-		elif dim in self._F[C]:
-			p = self._gaus(val, self._F[C][dim][0], self._F[C][dim][1])
-			
-		return p
-	
 	def predict(self, x):
 		y = []
 		for sample in x:
 			L = defaultdict(float)
 			for C in self._P:
 				for dim in sample:
-					L[C] += math.log(self.prob(C, dim, sample[dim]) or 1)
+					L[C] += math.log(self._prob(C, dim, sample[dim]) or 1)
 					
 #			y.append(max(L.keys(), key = lambda i: L[i]) if len(L) else next(iter(self._P)))
 			y.append(max(L.keys(), key = lambda i: L[i]) if len(L) else None)
-			
-		return y
-	
-	def test1(self, x):
-		y = []
-		for sample in x:
-			L = {}
-			for C in self._P:
-				L[C] = 0
-				for dim in range(0, len(sample)):
-					P = self._P[C][dim]
-					L[C] += math.log(self._gaus(sample[dim], P[0], P[1]))
-
-			y.append(max(L.keys(), key = lambda i: L[i]) if len(L) else next(iter(self._P)))
 			
 		return y
 	
