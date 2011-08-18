@@ -25,10 +25,6 @@ class SVM(ml.Classifier):
 		obj._model = liblinear.load_model(path + '-model')
 		return obj
 	
-	def get_class_id(self, C):
-		if C not in self._class_ids:
-			self._class_ids[C] = len(self._class_ids)
-		
 	def train(self, x, y):
 		labels = [self._labels.setId(C) for C in y]
 		data = []

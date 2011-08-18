@@ -50,6 +50,9 @@ class Autoincrement:
 	def getVal(self, id):
 		return self._inv[id] if id in self._inv else None
 	
+	def count(self):
+		return len(self._ids)
+	
 class FeatureSpace:
 	def __init__(self):
 		self.featureset = {}
