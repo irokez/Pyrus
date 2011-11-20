@@ -5,15 +5,15 @@ Created on Aug 17, 2011
 '''
 
 import math
-import ml
 from collections import defaultdict
+from .. import ml
 
 class NaiveBayes(ml.Classifier):
 	def __init__(self):
 		pass
 	
 	def _gaus(self, i, mean, var):
-		return 1 / math.sqrt(2 * math.pi * var) * math.exp(- (i - mean) ** 2 / (2 * var))
+		return (1 / math.sqrt(2 * math.pi * var) * math.exp(- (i - mean) ** 2 / (2 * var))) if var > 0 else float(1 if i == mean else 0)
 			
 
 	def _prob(self, C, dim, val):
@@ -63,18 +63,21 @@ class NaiveBayes(ml.Classifier):
 		F = {}
 		for C in data:
 			F[C] = {}
+			n = 0
 			for dim in numeric_features:
+				n += 1
+				print(n)
 				mean = 0; var = 0; N = 0
 				
 				# calculate mean and length
 				for sample in data[C]:
-					mean += sample[dim]
+					mean += sample[dim] if dim in sample else 0
 					N += 1
 				mean /= N
 				
 				# calculate variance
 				for sample in data[C]:
-					var += (mean - sample[dim]) ** 2
+					var += (mean - (sample[dim] if dim in sample else 0)) ** 2
 				var /= (N - 1)
 				
 				F[C][dim] = (mean, var)
