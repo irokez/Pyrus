@@ -7,7 +7,7 @@ import sys
 sys.path.append('/home/alexpak/tools/liblinear-1.8/python/')
 
 import liblinearutil as liblinear
-from .. import ml
+import ml
 import pickle
 
 class SVM(ml.Classifier):
@@ -44,6 +44,7 @@ class SVM(ml.Classifier):
 		y = []
 		for sample in x:
 			data = dict([(self._features.getId(d), sample[d]) for d in sample if self._features.getId(d)])
+			print(data)
 			label, _, _ = liblinear.predict([0], [data], self._model, '')
 			if self._labels.count() == 2:
 				label[0] = 1 if label[0] == 1 else 2

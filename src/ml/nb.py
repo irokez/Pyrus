@@ -6,7 +6,7 @@ Created on Aug 17, 2011
 
 import math
 from collections import defaultdict
-from .. import ml
+import ml
 
 class NaiveBayes(ml.Classifier):
 	def __init__(self):
