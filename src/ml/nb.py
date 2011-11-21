@@ -84,7 +84,7 @@ class NaiveBayes(ml.Classifier):
 								
 		self._F = F
 	
-	def predict(self, x):
+	def predict(self, x, return_likelihood = False):
 		y = []
 		for sample in x:
 			L = defaultdict(float)
@@ -93,7 +93,10 @@ class NaiveBayes(ml.Classifier):
 					L[C] += math.log(self._prob(C, dim, sample[dim]) or 1)
 					
 #			y.append(max(L.keys(), key = lambda i: L[i]) if len(L) else next(iter(self._P)))
-			y.append(max(L.keys(), key = lambda i: L[i]) if len(L) else None)
+			if return_likelihood:
+				y.append(L)
+			else:
+				y.append(max(L.keys(), key = lambda i: L[i]) if len(L) else None)
 			
 		return y
 	
