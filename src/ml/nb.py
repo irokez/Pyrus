@@ -66,7 +66,6 @@ class NaiveBayes(ml.Classifier):
 			n = 0
 			for dim in numeric_features:
 				n += 1
-				print(n)
 				mean = 0; var = 0; N = 0
 				
 				# calculate mean and length
@@ -78,7 +77,7 @@ class NaiveBayes(ml.Classifier):
 				# calculate variance
 				for sample in data[C]:
 					var += (mean - (sample[dim] if dim in sample else 0)) ** 2
-				var /= (N - 1)
+				var /= (N - 1) if N > 1 else N
 				
 				F[C][dim] = (mean, var)
 								

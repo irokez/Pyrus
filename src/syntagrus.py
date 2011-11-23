@@ -9,6 +9,57 @@ import sqlite3
 import xml.parsers.expat
 import glob
 from optparse import OptionParser
+from collections import namedtuple
+
+word_t = namedtuple('word_t', ['lemma', 'pos', 'feat', 'id', 'dom', 'link'])
+feat_ru_en = {
+	'ЕД': 'sg',
+	'МН': 'pl',
+	'ЖЕН': 'f',
+	'МУЖ': 'm',
+	'СРЕД': 'n',
+	'ИМ': 'nom',
+	'РОД': 'gen',
+	'ДАТ': 'dat',
+	'ВИН': 'acc',
+	'ТВОР': 'ins',
+	'ПР': 'prep',
+	'ПАРТ': 'gen2',
+	'МЕСТН': 'loc',
+	'ОД': 'anim',
+	'НЕОД': 'inan',
+	'ИНФ': 'inf',
+	'ПРИЧ': 'adjp',
+	'ДЕЕПР': 'advp',
+	'ПРОШ': 'pst',
+	'НЕПРОШ': 'npst',
+	'НАСТ': 'prs',
+	'1-Л': '1p',
+	'2-Л': '2p',
+	'3-Л': '3p',
+	'ИЗЪЯВ': 'real',
+	'ПОВ': 'imp',
+	'КР': 'shrt',
+	'НЕСОВ': 'imperf',
+	'СОВ': 'perf',
+	'СТРАД': 'pass',
+	'СЛ': 'compl',
+	'СМЯГ': 'soft',
+	'СРАВ': 'comp',
+	'ПРЕВ': 'supl',
+}
+
+link_ru_en = {
+	'предик': 'subj',
+	'1-компл': 'obj',
+	'2-компл': 'obj',
+	'3-компл': 'obj',
+	'4-компл': 'obj',
+	'5-компл': 'obj',
+	'опред': 'amod',
+	'предл': 'prep',
+	'обст': 'pobj'
+}
 
 class Reader:
 	def __init__(self):
@@ -19,7 +70,33 @@ class Reader:
 	
 	def start_element(self, name, attr):
 		if name == 'W':
-			self._info = attr
+			features = attr['FEAT'].split(' ') if 'FEAT' in attr else ['UNK']
+			for i in range(0, len(features)):
+				if features[i] in feat_ru_en:
+					features[i] = feat_ru_en[features[i]]
+					
+			lemma = lemma=attr['LEMMA'].lower() if 'LEMMA' in attr else ''
+			link = attr['LINK'] if 'LINK' in attr else None
+			if link in link_ru_en:
+				link = link_ru_en[link]
+				
+			dom = int(attr['DOM']) if attr['DOM'] != '_root' else 0
+			pos = features[0]
+			feat = set(features[1:])
+			
+			if 'adjp' in feat:
+				pos = 'VADJ'
+				feat -= {'adjp'}
+				
+			if 'advp' in feat:
+				pos = 'VADV'
+				feat -= {'advp'}
+			
+			if 'inf' in feat:
+				pos = 'VINF'
+				feat -= {'inf'}
+			
+			self._info = word_t(lemma=lemma, pos=pos, feat=feat, id=int(attr['ID']), dom=dom, link=link)
 			self._cdata = ''
 	
 	def end_element(self, name):
@@ -63,6 +140,7 @@ class Lexicon:
         create table words(
         	id integer primary key autoincrement,
         	lemma text,
+        	pos text,
         	form text,
         	info text,
         	freq integer
@@ -75,18 +153,11 @@ class Lexicon:
 		sentences = Reader().read(filename)
 		for sentence in sentences:
 			for word in sentence:
-				try:
-					form = word[0]
-					lemma = word[1]['LEMMA']
-					info = word[1]['FEAT']
-				except:
-					print(word)
-					continue
-				
-				self.cur.execute('select id from words where lemma = ? and form = ? and info = ?', (lemma, form, info))
+				feat = ' '.join(word[1].feat)
+				self.cur.execute('select id from words where lemma = ? and form = ? and pos = ? and info = ?', (word[1].lemma, word[0], word[1].pos, feat))
 				row = self.cur.fetchone()
 				if row is None:
-					self.cur.execute('insert into words (lemma, form, info, freq) values (?, ?, ?, 1)', (lemma, form, info))
+					self.cur.execute('insert into words (lemma, pos, form, info, freq) values (?, ?, ?, ?, 1)', (word[1].lemma, word[1].pos, word[0], feat))
 				else:
 					self.cur.execute('update words set freq = freq + 1 where id = ?', row)
 					
