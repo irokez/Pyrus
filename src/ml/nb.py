@@ -6,11 +6,14 @@ Created on Aug 17, 2011
 
 import math
 from collections import defaultdict
-import ml
+from .. import ml
 
 class NaiveBayes(ml.Classifier):
 	def __init__(self):
 		pass
+	
+	def __repr__(self):
+		return 'NaiveBayes'
 	
 	def _gaus(self, i, mean, var):
 		return (1 / math.sqrt(2 * math.pi * var) * math.exp(- (i - mean) ** 2 / (2 * var))) if var > 0 else float(1 if i == mean else 0)

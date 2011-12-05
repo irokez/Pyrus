@@ -10,6 +10,7 @@ if __name__ == '__main__':
 	from optparse import OptionParser
 	import syntagrus
 	import sys
+	import morph
 	
 	parser = OptionParser()
 	parser.usage = '%prog [options]'
@@ -17,6 +18,7 @@ if __name__ == '__main__':
 	parser.add_option('-T', '--test', action='store_const', const=True, dest='test', help='generate test file')
 	parser.add_option('-n', '--number', action='store', dest='number', type='int', help='number of files to process')
 	parser.add_option('-f', '--format', action='store', dest='format', type='string', help='output format')
+	parser.add_option('-M', '--nomorph', action='store_const', const=True, dest='nomorph', help='do not use morphology from annotations')
 
 	(options, args) = parser.parse_args()
 
@@ -48,12 +50,22 @@ if __name__ == '__main__':
 		
 		a_set = test_set if options.test else train_set
 		
+		if options.nomorph:
+			Tagger = morph.Tagger()
+			for sentence in a_set:
+				labeled = Tagger.label(sentence)
+				for w in range(0, len(sentence)):
+					sentence[w] = (sentence[w][0], sentence[w][1]._replace(pos=labeled[w][1], feat=labeled[w][2]))
+			
+		selected_feat = {'m', 'f', 'n', 'sg', 'pl', '1p', '2p', '3p', 'nom', 'gen', 'gen2', 'dat', 'acc', 'ins', 'prep', 'loc', 'real', 'imp', 'pass', 'comp', 'shrt'}		
+		#selected_feat = {'nom', 'gen', 'gen2', 'dat', 'acc', 'ins', 'prep', 'loc', 'real', 'imp', 'pass', 'comp', 'shrt'}		
+		
 		if options.format == 'malt':
 			# Malt TAB format
 			for sentence in a_set:
 				for word in sentence:
 					w = word[0] or 'FANTOM'
-					p = '.'.join([word[1].pos] + sorted(word[1].feat))
+					p = '.'.join([word[1].pos] + sorted(word[1].feat & selected_feat))
 					l = word[1].link if word[1].dom else 'ROOT'
 					d = str(word[1].dom)
 					print('\t'.join([w, p, d, l]))
@@ -68,7 +80,7 @@ if __name__ == '__main__':
 				dn = []
 				for word in sentence:
 					wn.append(word[0] or 'FANTOM')
-					pn.append('-'.join([word[1].pos] + sorted(word[1].feat)))
+					pn.append('-'.join([word[1].pos] + sorted(word[1].feat & selected_feat)))
 					ln.append(word[1].link if word[1].dom else 'ROOT')
 					dn.append(str(word[1].dom))
 					

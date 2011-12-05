@@ -7,7 +7,7 @@ import sys
 sys.path.append('/home/alexpak/tools/liblinear-1.8/python/')
 
 import liblinearutil as liblinear
-import ml
+from .. import ml
 import pickle
 
 class SVM(ml.Classifier):
@@ -15,7 +15,10 @@ class SVM(ml.Classifier):
 		self._labels = ml.Autoincrement()
 		self._features = ml.Autoincrement()
 		self._regression = False
-		
+
+	def __repr__(self):
+		return 'SVM'
+	
 	def save(self, path):
 		liblinear.save_model(path + '-model', self._model)
 		del(self._model)
