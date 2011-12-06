@@ -20,6 +20,30 @@ class Classifier:
 		
 		return (acc, )
 	
+	def evaluate_bin(self, gold, test, true_class):
+		tp = 0; fp = 0; tn = 0; fn = 0
+		
+		for i in range(0, len(gold)):
+			if gold[i] == true_class:
+				if test[i] == gold[i]:
+					tp += 1
+				else:
+					fn += 1
+			else:
+				if test[i] == gold[i]:
+					tn += 1
+				else:
+					fp += 1
+
+		acc = (tp + tn) / (tp + fp + tn + fn) if tp + fp + tn + fn else 0
+		pr = tp / (tp + fp) if tp + fp else 0
+		rec = tp / (tp + fn) if tp + fn else 0
+		prn = tn / (tn + fn) if tn + fn else 0
+		f1 = 2 * (pr * rec) / (pr + rec) if pr + rec else 0
+		
+		return (acc, pr, rec, f1, prn)
+
+	
 	def save(self, path):
 		f = open(path, 'wb')
 		pickle.dump(self, f)
