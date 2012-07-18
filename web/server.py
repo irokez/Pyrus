@@ -54,7 +54,7 @@ def recvall(the_socket,timeout=''):
 		except:
 			pass
 		#When a recv returns 0 bytes, other side has closed
-	result = ''.join((data.decode() for data in total_data))
+	result = ''.join((data.decode('utf-8') for data in total_data))
 	return result
 
 import morph
