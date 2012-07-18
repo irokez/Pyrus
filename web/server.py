@@ -20,32 +20,59 @@ f = open(path + 'html/tagging.html', 'rb')
 content = f.read().decode()
 f.close()
 
-import pos
 import re
 import template
-tagger = pos.Tagger()
-tagger.load(path + '../tmp/svm.model', path + '../tmp/ids.pickle')
+import socket
+import time
 
-rus = {
-	'S': 'сущ.', 
-	'A': 'прил.', 
-	'NUM': 'числ.', 
-	'A-NUM': 'числ.-прил.', 
-	'V': 'глаг.', 
-	'ADV': 'нареч.', 
-	'PRAEDIC': 'предикатив', 
-	'PARENTH': 'вводное', 
-	'S-PRO': 'местоим. сущ.', 
-	'A-PRO': 'местоим. прил.', 
-	'ADV-PRO': 'местоим. нареч.', 
-	'PRAEDIC-PRO': 'местоим. предик.', 
-	'PR': 'предлог', 
-	'CONJ': 'союз', 
-	'PART': 'частица', 
-	'INTJ': 'межд.', 
-	'INIT': 'инит', 
-	'NONLEX': 'нонлекс'
-}
+def recvall(the_socket,timeout=''):
+	#setup to use non-blocking sockets
+	#if no data arrives it assumes transaction is done
+	#recv() returns a string
+	the_socket.setblocking(0)
+	total_data=[];data=''
+	begin=time.time()
+	if not timeout:
+		timeout=1
+	while 1:
+		#if you got some data, then break after wait sec
+		if total_data and time.time()-begin>timeout:
+			break
+		#if you got no data at all, wait a little longer
+		elif time.time()-begin>timeout*2:
+			break
+		wait = 0
+		try:
+			data=the_socket.recv(4096)
+			if data:
+				total_data.append(data)
+				begin = time.time()
+				data = ''
+				wait = 0
+			else:
+				time.sleep(0.1)
+		except:
+			pass
+		#When a recv returns 0 bytes, other side has closed
+	result = ''.join((data.decode() for data in total_data))
+	return result
+
+import morph
+import re
+
+Tagger = morph.Tagger()
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect(("localhost", 5000))
+
+def get_color(pos):
+	if pos[0] == 'S':
+		return 'blue'
+	elif pos[0] == 'V':
+		return 'green'
+	elif pos[0] == 'A':
+		return 'orange'
+	else:
+		return 'gray'
 
 class HelloWorld:
 	@cherrypy.expose
@@ -53,19 +80,62 @@ class HelloWorld:
 
 		start = time.time()
 		
-		sentence = [word for word in re.split('\W+', text) if len(word.strip())]
+		sentence = [[w] for w in re.split('\W+', text) if len(w)]
+	
+		labeled = Tagger.label(sentence)
+		for w in range(0, len(sentence)):
+			sentence[w] = (sentence[w][0], labeled[w][1], labeled[w][2])
+			
+		selected_feat = {'m', 'f', 'n', 'sg', 'pl', '1p', '2p', '3p', 'nom', 'gen', 'gen2', 'dat', 'acc', 'ins', 'prep', 'loc', 'real', 'imp', 'pass', 'comp', 'shrt'}		
 		
-		tagged = []
-		for word, label in tagger.label(sentence):
-			tagged.append((word, rus[tagger.get_label(label)]))
+		parser_input = []
+		for word in sentence:
+			w = word[0] or 'FANTOM'
+			p = '.'.join([word[1]] + sorted(word[2] & selected_feat))
+			parser_input.append('{0}\t{1}\n'.format(w, p))
+
+		for word in parser_input:
+			client_socket.send(bytes(word, 'utf-8'))
 		
+		client_socket.send(bytes('\n', 'utf-8'))
+		
+		data = recvall(client_socket).strip()
+			
 		time_total = time.time() - start
 		words = len(sentence)
 		words_per_sec = words / time_total
+		
+		edges = []
+		nodes = [(0, 'ROOT', 'red')]
+		
+		tagged = [tuple(row.split('\t')) for row in data.split('\n')]
+		n = 0
+		for word in tagged:
+			n += 1
+			if len(word) < 4:
+				continue
+			
+			nodes.append((n, word[0], get_color(word[1])))
+			
+		n = 0
+		for word in tagged:
+			n += 1
+			if len(word) < 4:
+				continue
+			head = int(word[2])
+			if len(tagged) < head:
+				head = 0
+			
+			try:
+				edges.append((n, head, word[3]))
+			finally:
+				pass
 
 		T = template.Template()
 		T.text = cgi.escape(text)
 		T.tagged = tagged
+		T.edges = edges
+		T.nodes = nodes
 		T.time_total = round(time_total, 2)
 		T.words_per_sec = round(words_per_sec)
 		T.words = words

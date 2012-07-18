@@ -2,10 +2,14 @@
 <html>
     <head>
         <meta charset="utf-8" />
-        <title>POS-tagging demo - Pyrus</title>
+        <title>Parsing demo - Pyrus</title>
         <link rel="stylesheet" href="/css/main.css" />
         <link rel="shortcut icon" href="/favicon.ico" />
         <!--[if lt IE 9]><script src="/js/html5.js"></script><![endif]-->
+        <script type="text/javascript" src="/js/raphael-min.js"></script>
+        <script type="text/javascript" src="/js/dracula_graffle.js"></script>
+        <script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
+        <script type="text/javascript" src="/js/dracula_graph.js"></script>
     </head>
     <body>
         <div id="wrapper">
@@ -15,11 +19,34 @@
                 </hgroup>
             </header>
             <article>
-                <h1>POS-tagging demo</h1>
+                <h1>Parsing demo</h1>
                 {if len(text)}
                 <div id="result">
                     <p>{$text}</p>
-                    <p>{$tagged}</p>
+                    <ul>
+                        {for word in tagged}
+                        <li>{$word}</li>
+                        {end}
+                    </ul>
+                    <div id="graph"></div>
+
+<script type="text/javascript">
+$(function(){
+    var g = new Graph();
+    {for id, name, color in nodes}
+    g.addNode("{$id}", {label: "{$name}"});
+    {end}
+    {for word1, word2, label in edges}
+    g.addEdge("{$word1}", "{$word2}", {directed: true, label: "{$label}"});
+    {end}
+     
+    var layouter = new Graph.Layout.Spring(g);
+    layouter.layout();
+     
+    var renderer = new Graph.Renderer.Raphael('graph', g, 800, 600);
+    renderer.draw();
+});
+</script>
                     <p>Tagged {$words} words in {$time_total} sec, {$words_per_sec} words per sec</p>
                 </div>
                 {else}
@@ -36,7 +63,7 @@
                 </form>
             </article>
             <footer>
-                <p>&copy; 2011 Pyrus</p>
+                <p>&copy; 2011&ndash;2012 Pyrus</p>
             </footer>
         </div>
     </body>
