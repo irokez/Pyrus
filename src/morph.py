@@ -5,10 +5,15 @@ Created on Nov 21, 2011
 @author: alexpak
 '''
 
-import ml
-#from ml.nb import NaiveBayes as Classifier
-from ml.svm import SVM as Classifier
+import sys
+
+from yatk import ml
+from yatk.ml import svm
+from yatk.ml.svm import SVM as Classifier
 from collections import Counter
+
+sys.modules['ml'] = ml
+sys.modules['ml.svm'] = svm
 
 def intersects_classes(classes):
 	return lambda w: (w[1].feat & classes).pop()

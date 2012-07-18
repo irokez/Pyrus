@@ -43,11 +43,16 @@ class Template:
 		stack_chain.append(current_stack)
 		expr = tuple()
 		last_if = tuple()
+		open_bracket = False
 		for ch in template:
 			if ch == '{':
+				if open_bracket:
+					current_stack.append('{')
+					
+				open_bracket = True
 				current_stack.append(buffer)
 				buffer = ''
-			elif ch == '}':
+			elif ch == '}' and len(buffer):
 				if buffer[0:3] == 'if ':
 					expr = ('if', buffer[3:], [], [])
 					current_stack.append(expr)
@@ -73,12 +78,21 @@ class Template:
 
 				elif buffer == 'end':
 					current_stack = stack_chain.pop()
-					
+				
+				else:
+					if open_bracket:
+						current_stack.append('{')
+
+					current_stack.append(buffer + '}')
+				
+				open_bracket = False
 				buffer = ''
 			else:
 				buffer += ch
 		
 		if buffer:		
+			if open_bracket:
+				current_stack.append('{')
 			current_stack.append(buffer)
 
 		source = '__s__ = ""' + print_stack(stack)
