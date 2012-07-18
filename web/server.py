@@ -79,66 +79,68 @@ class HelloWorld:
 	def index(self, text = ''):
 
 		start = time.time()
-		
-		sentence = [[w] for w in re.split('\W+', text) if len(w)]
-	
-		labeled = Tagger.label(sentence)
-		for w in range(0, len(sentence)):
-			sentence[w] = (sentence[w][0], labeled[w][1], labeled[w][2])
-			
-		selected_feat = {'m', 'f', 'n', 'sg', 'pl', '1p', '2p', '3p', 'nom', 'gen', 'gen2', 'dat', 'acc', 'ins', 'prep', 'loc', 'real', 'imp', 'pass', 'comp', 'shrt'}		
-		
-		parser_input = []
-		for word in sentence:
-			w = word[0] or 'FANTOM'
-			p = '.'.join([word[1]] + sorted(word[2] & selected_feat))
-			parser_input.append('{0}\t{1}\n'.format(w, p))
-
-		for word in parser_input:
-			client_socket.send(bytes(word, 'utf-8'))
-		
-		client_socket.send(bytes('\n', 'utf-8'))
-		
-		data = recvall(client_socket).strip()
-			
-		time_total = time.time() - start
-		words = len(sentence)
-		words_per_sec = words / time_total
-		
-		edges = []
-		nodes = [(0, 'ROOT', 'red')]
-		
-		tagged = [tuple(row.split('\t')) for row in data.split('\n')]
-		n = 0
-		for word in tagged:
-			n += 1
-			if len(word) < 4:
-				continue
-			
-			nodes.append((n, word[0], get_color(word[1])))
-			
-		n = 0
-		for word in tagged:
-			n += 1
-			if len(word) < 4:
-				continue
-			head = int(word[2])
-			if len(tagged) < head:
-				head = 0
-			
-			try:
-				edges.append((n, head, word[3]))
-			finally:
-				pass
-
+		text = text.strip()
 		T = template.Template()
 		T.text = cgi.escape(text)
-		T.tagged = tagged
-		T.edges = edges
-		T.nodes = nodes
-		T.time_total = round(time_total, 2)
-		T.words_per_sec = round(words_per_sec)
-		T.words = words
+		
+		sentence = [[w] for w in re.split('\W+', text) if len(w)] if len(text) else []
+		
+		if len(sentence):
+			labeled = Tagger.label(sentence)
+			for w in range(0, len(sentence)):
+				sentence[w] = (sentence[w][0], labeled[w][1], labeled[w][2])
+				
+			selected_feat = {'m', 'f', 'n', 'sg', 'pl', '1p', '2p', '3p', 'nom', 'gen', 'gen2', 'dat', 'acc', 'ins', 'prep', 'loc', 'real', 'imp', 'pass', 'comp', 'shrt'}		
+			
+			parser_input = []
+			for word in sentence:
+				w = word[0] or 'FANTOM'
+				p = '.'.join([word[1]] + sorted(word[2] & selected_feat))
+				parser_input.append('{0}\t{1}\n'.format(w, p))
+	
+			for word in parser_input:
+				client_socket.send(bytes(word, 'utf-8'))
+			
+			client_socket.send(bytes('\n', 'utf-8'))
+			
+			data = recvall(client_socket).strip()
+				
+			time_total = time.time() - start
+			words = len(sentence)
+			words_per_sec = words / time_total
+			
+			edges = []
+			nodes = [(0, 'ROOT', 'red')]
+			
+			tagged = [tuple(row.split('\t')) for row in data.split('\n')]
+			n = 0
+			for word in tagged:
+				n += 1
+				if len(word) < 4:
+					continue
+				
+				nodes.append((n, word[0], get_color(word[1])))
+				
+			n = 0
+			for word in tagged:
+				n += 1
+				if len(word) < 4:
+					continue
+				head = int(word[2])
+				if len(tagged) < head:
+					head = 0
+				
+				try:
+					edges.append((n, head, word[3]))
+				finally:
+					pass
+
+			T.tagged = tagged
+			T.edges = edges
+			T.nodes = nodes
+			T.time_total = round(time_total, 2)
+			T.words_per_sec = round(words_per_sec)
+			T.words = words
 		
 		return T.transform(content)
 	
