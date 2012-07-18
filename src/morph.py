@@ -177,10 +177,10 @@ class Guesser:
 	
 class Tagger:
 	def __init__(self):
-		self._pos = Guesser.load('tmp/pos')
+		self._pos = Guesser.load('res/model/pos')
 		self._guesser = {}
 		for cat in cats:
-			self._guesser[cat[0]] = Guesser.load('tmp/' + cat[0])
+			self._guesser[cat[0]] = Guesser.load('res/model/' + cat[0])
 	
 	def label(self, sentence):
 		tagged = self._pos.predict([sentence])[0]
@@ -273,7 +273,7 @@ if __name__ == '__main__':
 			G.make_class = cat[2]
 			G.train(train_set)
 			results = G.test(test_set)
-			G.save('tmp/' + cat[0])
+			G.save('res/model/' + cat[0])
 			del(G)
 			print('{0}\t\t{1:.3f}%'.format(cat[0], results[0] * 100))
 		
