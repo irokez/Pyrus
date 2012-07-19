@@ -26,11 +26,9 @@ import socket
 import time
 
 def recvall2(sock):
-	sock.setblocking(0)
 	output = ''
 	while True:
 		data = sock.recv(4096)
-		print(data, file=sys.stderr)
 		if not data:
 			break
 		output += data.decode('utf-8')
@@ -72,8 +70,6 @@ import morph
 import re
 
 Tagger = morph.Tagger()
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect(("localhost", 5000))
 
 def get_color(pos):
 	if pos[0] == 'S':
@@ -182,11 +178,17 @@ class HelloWorld:
 'языком	S.ins.m.sg\n'
 ]
 			'''
+
+			client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+			client_socket.connect(("localhost", 5000))
 			for word in parser_input:
 				client_socket.send(bytes(word, 'utf-8'))
 			
 			client_socket.send(bytes('\n', 'utf-8'))
-			data = recvall(client_socket).strip()
+			#data = recvall(client_socket).strip()
+			#data = client_socket.recv(1024).decode('utf-8').strip()
+			data = recvall2(client_socket).strip()
+			client_socket.close()
 			#data = ''.join(parser_input).strip()
 				
 			time_total = time.time() - start
