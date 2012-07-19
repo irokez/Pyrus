@@ -32,7 +32,40 @@ article {
         margin-top: 16px;
         line-height: 24px;
     }
-    
+
+	#result table {
+		border-collapse: collapse;
+		margin: 16px 0;
+	}
+
+		#result th {
+			padding: 0px 20px 0 0;
+			text-align: left;
+			font-size: 14px;
+			font-weight: normal;
+		}
+		#result td {
+			padding: 0px 0px 0 0;
+			font-style: italic;
+			font-size: 14px;
+			color: #333;
+		}
+        g.node {
+            font-family: Verdana, Helvetica;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        circle.node-dot {
+            fill: lightsalmon;
+            stroke: red;
+            stroke-width: 1px;
+        }
+
+        path.link {
+            fill: none;
+            stroke: gray;
+        }
+  
     #description {
         padding: 20px;
         background: #eee;

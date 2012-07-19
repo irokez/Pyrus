@@ -74,6 +74,60 @@ def get_color(pos):
 	else:
 		return 'gray'
 
+categories = {
+	'S': 'существительное',
+	'A': 'прилагательное',
+	'V': 'глагол',
+	'ADV': 'наречие',
+	'NID': 'инстранное',
+	'NUM': 'числительное',
+	'PR': 'предлог',
+	'PART': 'частица',
+	'CONJ': 'союз',
+	'COM': 'коммуникативное',
+	'INTJ': 'междометие',
+	'P': 'P',
+	'UNK': 'неизвестное',
+	'm': 'муж. род',
+	'f': 'жен. род',
+	'n': 'ср. род',
+	'sg': 'ед. число',
+	'pl': 'мн. число',
+	'nom': 'им. падеж',
+	'gen': 'род. падеж',
+	'dat': 'дат. падеж',
+	'acc': 'вин. падеж',
+	'ins': 'твор. падеж',
+	'prep': 'пред. падеж',
+	'gen2': 'второй род. падеж',
+	'loc': 'локац. падеж',
+	'anim': 'одуш.',
+	'inan': 'неодуш.',
+	'1p': '1е лицо',
+	'2p': '2е лицо',
+	'3p': '3е лицо',
+	'perf': 'соверш.',
+	'imperf': 'несоверш.',
+	'real': 'действ.',
+	'imp': 'повелит.',
+	'pass': 'страд.',
+	'pst': 'прош. время',
+	'npst': 'непрош. время',
+	'prs': 'наст. время',
+	'comp': 'сравн. степень',
+	'supl': 'превосх. степень',
+	'shrt': 'кратк.'
+}
+def pos_to_human(pos):
+	loc = []
+	for feat in pos.split('.'):
+		if feat in categories:
+			loc.append(categories[feat])
+		else:
+			loc.append(feat)
+
+	return loc
+
 class HelloWorld:
 	@cherrypy.expose
 	def index(self, text = ''):
@@ -102,8 +156,8 @@ class HelloWorld:
 				client_socket.send(bytes(word, 'utf-8'))
 			
 			client_socket.send(bytes('\n', 'utf-8'))
-			
 			data = recvall(client_socket).strip()
+			#data = ''.join(parser_input).strip()
 				
 			time_total = time.time() - start
 			words = len(sentence)
@@ -135,7 +189,8 @@ class HelloWorld:
 				finally:
 					pass
 
-			T.tagged = tagged
+			print(tagged, file=sys.stderr)
+			T.tagged = [(word[0], ', '.join(pos_to_human(word[1]))) for word in tagged]
 			T.edges = edges
 			T.nodes = nodes
 			T.time_total = round(time_total, 2)

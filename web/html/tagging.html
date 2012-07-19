@@ -10,6 +10,8 @@
         <script type="text/javascript" src="/js/dracula_graffle.js"></script>
         <script type="text/javascript" src="/js/jquery-1.4.2.min.js"></script>
         <script type="text/javascript" src="/js/dracula_graph.js"></script>
+        <script type="text/javascript" src="/js/d3.v2.min.js"></script>
+        <script type="text/javascript" src="/js/d3-tree-test.js"></script>
     </head>
     <body>
         <div id="wrapper">
@@ -23,14 +25,54 @@
                 {if len(text)}
                 <div id="result">
                     <p>{$text}</p>
-                    <ul>
-                        {for word in tagged}
-                        <li>{$word}</li>
+                    <table>
+			<tbody>
+                        {for word, pos in tagged}
+				<tr>
+					<th>{$word}</th>
+		                        <td>{$pos}</td>
+				</tr>
                         {end}
-                    </ul>
+			</tbody>
+                    </table>
                     <div id="graph"></div>
 
-<script type="text/javascript">
+<script>
+Data = {children: {}, nodes: {}};
+
+function get_children(node)
+{
+	var children = [];
+	if (node.id in Data.children) {
+		var ids = Data.children[node.id];
+		for (var i = 0; i < ids.length; ++i) {
+			children.push(Data.nodes[ids[i]]);
+		}
+	}
+	return children;
+}
+
+function add_child(id, parent, label)
+{
+	if (!(parent in Data.children)) {
+		Data.children[parent] = [];
+	}
+	Data.children[parent].push(id);
+	Data.nodes[id].name += " (" + label + ")";
+}
+
+{for id, name, color in nodes}
+Data.nodes[{$id}] = {id: {$id}, name: "{$name}"};
+{end}
+{for word1, word2, label in edges}
+add_child({$word1}, {$word2}, "{$label}");
+{end}
+
+    $(function(){
+        buildTree("#graph");
+    });
+</script>
+<script type="blabla">
 $(function(){
     var g = new Graph();
     {for id, name, color in nodes}
