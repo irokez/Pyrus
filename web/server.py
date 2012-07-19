@@ -154,7 +154,6 @@ class HelloWorld:
 		sentence = [[w] for w in re.split('\W+', text) if len(w)] if len(text) else []
 		
 		if len(sentence):
-			'''
 			labeled = Tagger.label(sentence)
 			for w in range(0, len(sentence)):
 				sentence[w] = (sentence[w][0], labeled[w][1], labeled[w][2])
@@ -182,6 +181,7 @@ class HelloWorld:
 'русским	A.ins.m.sg\n',
 'языком	S.ins.m.sg\n'
 ]
+			'''
 			for word in parser_input:
 				client_socket.send(bytes(word, 'utf-8'))
 			
