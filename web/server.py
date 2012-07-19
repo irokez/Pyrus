@@ -25,6 +25,17 @@ import template
 import socket
 import time
 
+def recvall2(sock):
+	sock.setblocking(0)
+	output = ''
+	while True:
+		data = sock.recv(4096)
+		print(data, file=sys.stderr)
+		if not data:
+			break
+		output += data.decode('utf-8')
+	return output
+
 def recvall(the_socket,timeout=''):
 	#setup to use non-blocking sockets
 	#if no data arrives it assumes transaction is done
@@ -75,19 +86,22 @@ def get_color(pos):
 		return 'gray'
 
 categories = {
-	'S': 'существительное',
-	'A': 'прилагательное',
+	'S': 'сущ.',
+	'A': 'прил.',
 	'V': 'глагол',
-	'ADV': 'наречие',
-	'NID': 'инстранное',
-	'NUM': 'числительное',
+	'VINF': 'инф.',
+	'VADJ': 'прич.',
+	'VADV': 'дееп.',
+	'ADV': 'нар.',
+	'NID': 'инoстр.',
+	'NUM': 'числ.',
 	'PR': 'предлог',
-	'PART': 'частица',
+	'PART': 'част.',
 	'CONJ': 'союз',
-	'COM': 'коммуникативное',
-	'INTJ': 'междометие',
+	'COM': 'ком.',
+	'INTJ': 'межд.',
 	'P': 'P',
-	'UNK': 'неизвестное',
+	'UNK': '???',
 	'm': 'муж. род',
 	'f': 'жен. род',
 	'n': 'ср. род',
@@ -99,8 +113,8 @@ categories = {
 	'acc': 'вин. падеж',
 	'ins': 'твор. падеж',
 	'prep': 'пред. падеж',
-	'gen2': 'второй род. падеж',
-	'loc': 'локац. падеж',
+	'gen2': '2й род. падеж',
+	'loc': 'мест. падеж',
 	'anim': 'одуш.',
 	'inan': 'неодуш.',
 	'1p': '1е лицо',
@@ -140,6 +154,7 @@ class HelloWorld:
 		sentence = [[w] for w in re.split('\W+', text) if len(w)] if len(text) else []
 		
 		if len(sentence):
+			'''
 			labeled = Tagger.label(sentence)
 			for w in range(0, len(sentence)):
 				sentence[w] = (sentence[w][0], labeled[w][1], labeled[w][2])
@@ -151,7 +166,22 @@ class HelloWorld:
 				w = word[0] or 'FANTOM'
 				p = '.'.join([word[1]] + sorted(word[2] & selected_feat))
 				parser_input.append('{0}\t{1}\n'.format(w, p))
-	
+			'''
+			parser_input = [
+'Я	S.m.nom.sg\n',
+'лишь	PART\n',
+'покажу	V.1p.real.sg\n',
+'как	CONJ\n',
+'можно	ADV\n',
+'обучить	VINF\n',
+'существующий	VADJ.m.nom.pass.sg\n',
+'парсер	S.acc.m.sg\n',
+'для	PR\n',
+'работы	S.f.gen.sg\n',
+'с	PR\n',
+'русским	A.ins.m.sg\n',
+'языком	S.ins.m.sg\n'
+]
 			for word in parser_input:
 				client_socket.send(bytes(word, 'utf-8'))
 			

@@ -53,11 +53,11 @@ article {
         g.node {
             font-family: Verdana, Helvetica;
             font-size: 12px;
-            font-weight: bold;
+            font-weight: normal;
         }
         circle.node-dot {
-            fill: lightsalmon;
-            stroke: red;
+            fill: white;
+            stroke: steelblue;
             stroke-width: 1px;
         }
 
