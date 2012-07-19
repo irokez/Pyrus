@@ -25,7 +25,7 @@ import template
 import socket
 import time
 
-def recvall2(sock):
+def recvall(sock):
 	output = ''
 	while True:
 		data = sock.recv(4096)
@@ -33,38 +33,6 @@ def recvall2(sock):
 			break
 		output += data.decode('utf-8')
 	return output
-
-def recvall(the_socket,timeout=''):
-	#setup to use non-blocking sockets
-	#if no data arrives it assumes transaction is done
-	#recv() returns a string
-	the_socket.setblocking(0)
-	total_data=[];data=''
-	begin=time.time()
-	if not timeout:
-		timeout=1
-	while 1:
-		#if you got some data, then break after wait sec
-		if total_data and time.time()-begin>timeout:
-			break
-		#if you got no data at all, wait a little longer
-		elif time.time()-begin>timeout*2:
-			break
-		wait = 0
-		try:
-			data=the_socket.recv(4096)
-			if data:
-				total_data.append(data)
-				begin = time.time()
-				data = ''
-				wait = 0
-			else:
-				time.sleep(0.1)
-		except:
-			pass
-		#When a recv returns 0 bytes, other side has closed
-	result = ''.join((data.decode('utf-8') for data in total_data))
-	return result
 
 import morph
 import re
@@ -146,10 +114,12 @@ class HelloWorld:
 		text = text.strip()
 		T = template.Template()
 		T.text = cgi.escape(text)
+		error = ''
 		
 		sentence = [[w] for w in re.split('\W+', text) if len(w)] if len(text) else []
 		
-		if len(sentence):
+		if 0 < len(sentence) < 25:
+				
 			labeled = Tagger.label(sentence)
 			for w in range(0, len(sentence)):
 				sentence[w] = (sentence[w][0], labeled[w][1], labeled[w][2])
@@ -161,23 +131,6 @@ class HelloWorld:
 				w = word[0] or 'FANTOM'
 				p = '.'.join([word[1]] + sorted(word[2] & selected_feat))
 				parser_input.append('{0}\t{1}\n'.format(w, p))
-			'''
-			parser_input = [
-'Я	S.m.nom.sg\n',
-'лишь	PART\n',
-'покажу	V.1p.real.sg\n',
-'как	CONJ\n',
-'можно	ADV\n',
-'обучить	VINF\n',
-'существующий	VADJ.m.nom.pass.sg\n',
-'парсер	S.acc.m.sg\n',
-'для	PR\n',
-'работы	S.f.gen.sg\n',
-'с	PR\n',
-'русским	A.ins.m.sg\n',
-'языком	S.ins.m.sg\n'
-]
-			'''
 
 			client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 			client_socket.connect(("localhost", 5000))
@@ -185,11 +138,8 @@ class HelloWorld:
 				client_socket.send(bytes(word, 'utf-8'))
 			
 			client_socket.send(bytes('\n', 'utf-8'))
-			#data = recvall(client_socket).strip()
-			#data = client_socket.recv(1024).decode('utf-8').strip()
-			data = recvall2(client_socket).strip()
+			data = recvall(client_socket).strip()
 			client_socket.close()
-			#data = ''.join(parser_input).strip()
 				
 			time_total = time.time() - start
 			words = len(sentence)
@@ -228,6 +178,10 @@ class HelloWorld:
 			T.time_total = round(time_total, 2)
 			T.words_per_sec = round(words_per_sec)
 			T.words = words
+		elif len(sentence) > 25:
+			error = 'Sentence is too long, looks like "War and Peace"'
+
+		T.error = error
 		
 		return T.transform(content)
 	

@@ -22,7 +22,7 @@
             </header>
             <article>
                 <h1>Parsing demo</h1>
-                {if len(text)}
+                {if len(text) and not len(error)}
                 <div id="result">
                     <p>{$text}</p>
                     <table>
@@ -72,28 +72,12 @@ add_child({$word1}, {$word2}, "{$label}");
         buildTree("#graph");
     });
 </script>
-<script type="blabla">
-$(function(){
-    var g = new Graph();
-    {for id, name, color in nodes}
-    g.addNode("{$id}", {label: "{$name}"});
-    {end}
-    {for word1, word2, label in edges}
-    g.addEdge("{$word1}", "{$word2}", {directed: true, label: "{$label}"});
-    {end}
-     
-    var layouter = new Graph.Layout.Spring(g);
-    layouter.layout();
-     
-    var renderer = new Graph.Renderer.Raphael('graph', g, 800, 600);
-    renderer.draw();
-});
-</script>
                     <p>Parsed {$words} words in {$time_total} sec, {$words_per_sec} words per sec</p>
                 </div>
                 {else}
                 <div id="description">
                     <p>Enter the text and press "Tag"</p>
+			{if len(error)}<p><b>{$error}</b></p>{end}
                     <p><b>For example:</b> <a href="?text=Съешьте еще этих мягких французских булок, да выпейте же чаю">Съешьте еще этих мягких французских булок, да выпейте же чаю</a></p>
                 </div>
                 {end}
