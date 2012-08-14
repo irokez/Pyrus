@@ -39,6 +39,8 @@ class HelloWorld:
 		q = q.strip()
 		error = ''
 
+		T = template.Template()
+
 		if len(q):
 			cached = r.get(q)
 
@@ -56,8 +58,6 @@ class HelloWorld:
 				r.setex(q, TTL, cached)
 
 			results = json.loads(cached)
-
-			T = template.Template()
 
 			docs = []
 
