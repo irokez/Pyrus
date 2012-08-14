@@ -1,0 +1,102 @@
+@import "reset5.css";
+
+body {
+    font-family: sans-serif;
+}
+
+#wrapper {
+    padding: 20px;
+}
+
+header {
+    padding: 20px 0;
+} 
+
+    header h1 {
+        font-size: 32px;
+        font-weight: normal;
+    }
+    
+article {
+    
+}
+
+    article h1 {
+        font-size: 18px;
+        font-weight: normal;
+    }
+    
+    #result {
+        padding: 20px;
+        background: #eee;
+        margin-top: 16px;
+        line-height: 24px;
+    }
+
+	#result table {
+		border-collapse: collapse;
+		margin: 16px 0;
+	}
+
+        #result .pos {
+            background: PaleGreen;
+        }
+        #result .neg {
+            background: LightSalmon;
+        }
+
+		#result th {
+			padding: 0px 20px 0 0;
+			text-align: left;
+			font-size: 14px;
+			font-weight: normal;
+		}
+		#result td {
+			padding: 0px 0px 0 0;
+			font-style: italic;
+			font-size: 14px;
+			color: #333;
+		}
+
+    #description {
+        padding: 20px;
+        background: #eee;
+        margin-top: 16px;
+        line-height: 24px;
+    }
+    
+    form {
+        padding: 20px 0;
+        position: relative;
+    }
+    
+        div#text {
+            padding-right: 240px;
+            margin-bottom: 16px;
+        }
+        
+            input {
+                font-family: serif;
+                font-size: 24px;
+                padding: 10px;
+                width: 100%;
+                border: 1px inset #999;
+            }
+    
+        div#submit {
+            position: absolute;
+            top: 19px;
+            right: 0px;
+            text-align: center;
+        }
+    
+            button {
+                font-size: 24px;
+                padding: 10px;
+                text-align: center;
+                width: 200px;
+            }
+    
+footer {
+    padding: 20px 0;
+}

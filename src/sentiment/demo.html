@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>Sentiment analysis demo - Pyrus</title>
+		<link rel="stylesheet" href="/main.css" />
+		<link rel="shortcut icon" href="/favicon.ico" />
+	</head>
+	<body>
+		<div id="wrapper">
+			<header>
+				<hgroup>
+					<h1>Pyrus</h1>
+				</hgroup>
+			</header>
+			<article>
+				<h1>Sentiment anlysis demo</h1>
+				{if len(q) and not len(error)}
+				<div id="result">
+					<p>Movie: "{$q}"</p>
+					<table>
+						<tbody>
+							{for cl, text in output}
+							<tr class="{$cl}">
+								<th>{$cl}</th>
+								<td>{$text}</td>
+							</tr>
+							{end}
+						</tbody>
+					</table>
+					<p>Classified {$msgs} messages in {$time_total} sec, {$msgs_per_sec} msgs per sec</p>
+				</div>
+				{else}
+				<div id="description">
+					<p>Enter a movie name and press "Search"</p>
+					 {if len(error)}<p><b>{$error}</b></p>{end}
+					<p><b>For example:</b> <a href="?q=темный+рыцарь">темный рыцарь</a></p>
+				</div>
+				{end}
+				<form action="/">
+					<fieldset>
+						<div id="text"><input name="q" /></div>
+						<div id="submit"><button type="submit">Search</button></div>
+                        <div id="hint">
+                            <a href="?q=темный+рыцарь">темный рыцарь</a>
+                            <a href="?q=третий+лишний">третий лишний</a>
+                            <a href="?q=вспомнить+все">вспомнить все</a>
+                        </div>
+					</fieldset>
+				</form>
+			</article>
+			<footer>
+				<p>&copy; 2011&ndash;2012 Pyrus</p>
+			</footer>
+		</div>
+	</body>
+</html>
